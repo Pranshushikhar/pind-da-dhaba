@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { createPunjabiMan, createPunjabiWoman } from './punjabiRigs';
 
 export interface PunjabiCharacterCanvasProps {
   character: 'man' | 'woman';
@@ -16,10 +15,12 @@ export const PunjabiCharacterCanvas: React.FC<PunjabiCharacterCanvasProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
   const activeActionRef = useRef<THREE.AnimationAction | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     const container = containerRef.current;
     if (!container) return;
 
@@ -30,7 +31,6 @@ export const PunjabiCharacterCanvas: React.FC<PunjabiCharacterCanvasProps> = ({
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(34, container.clientWidth / container.clientHeight, 0.1, 50);
-    // Position camera for a luxury full-body framing
     if (character === 'man') {
       camera.position.set(0, 0.98, 3.4);
       camera.lookAt(0, 0.95, 0);
@@ -53,21 +53,17 @@ export const PunjabiCharacterCanvas: React.FC<PunjabiCharacterCanvasProps> = ({
     container.appendChild(renderer.domElement);
 
     // --- CINEMATIC HOSPITALITY LIGHTING ---
-    // Warm ambient light
     const ambientLight = new THREE.AmbientLight(0xfff3e3, 1.3);
     scene.add(ambientLight);
 
-    // Key Light (Warm Saffron / Champagne Gold)
     const keyLight = new THREE.DirectionalLight(0xf9e4b7, 2.8);
     keyLight.position.set(2.5, 4.0, 3.0);
     scene.add(keyLight);
 
-    // Fill Light (Soft Ivory/Steel contrast)
     const fillLight = new THREE.DirectionalLight(0xd4e2ee, 1.1);
     fillLight.position.set(-2.5, 2.5, 2.0);
     scene.add(fillLight);
 
-    // Rim / Backlight (Vibrant Amber / Terracotta Edge Glow)
     const rimLight = new THREE.DirectionalLight(0xe67e22, 3.2);
     rimLight.position.set(0, 3.0, -3.0);
     scene.add(rimLight);
@@ -97,59 +93,92 @@ export const PunjabiCharacterCanvas: React.FC<PunjabiCharacterCanvasProps> = ({
     shadowMesh.position.y = 0.01;
     scene.add(shadowMesh);
 
-    // --- MODEL ATTACHMENT & ANIMATION MIXER SETUP ---
+    // --- ANIMATION MIXER & SETUP ---
     let mixer: THREE.AnimationMixer | null = null;
 
     const setupAnimations = (rootObj: THREE.Object3D, animations: THREE.AnimationClip[]) => {
+      // Ensure frustum culling doesn't clip skinned meshes during animation
+      rootObj.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.frustumCulled = false;
+        }
+      });
+
       scene.add(rootObj);
 
       mixer = new THREE.AnimationMixer(rootObj);
       mixerRef.current = mixer;
 
-      const targetClipName = defaultClip || (character === 'man' ? 'Bhangra' : 'Namaste');
-      let clip = THREE.AnimationClip.findByName(animations, targetClipName);
-      if (!clip && animations.length > 0) {
-        clip = animations[0];
+      const clipNames = animations.map((a) => a.name);
+      console.log(`[GLTF Animations] ${character} available animation clips:`, clipNames);
+
+      // Preferred animation clip detection
+      const preferredName = character === 'man' ? 'Bhangra' : 'Namaste';
+      const targetQuery = (defaultClip || preferredName).toLowerCase();
+
+      let targetClip = animations.find((a) => a.name.toLowerCase() === targetQuery);
+      if (!targetClip) {
+        targetClip = animations.find((a) =>
+          a.name.toLowerCase().includes(character === 'man' ? 'bhangra' : 'namaste')
+        );
+      }
+      if (!targetClip && animations.length > 0) {
+        targetClip = animations[0];
       }
 
-      if (clip && mixer) {
-        const action = mixer.clipAction(clip);
+      if (targetClip) {
+        console.log(
+          `[GLTF Animation Action] Playing clip "${targetClip.name}" (${targetClip.duration.toFixed(2)}s) for ${character}`
+        );
+        const action = mixer.clipAction(targetClip);
         action.setLoop(THREE.LoopRepeat, Infinity);
         action.clampWhenFinished = false;
         action.play();
         activeActionRef.current = action;
 
-        // If user prefers reduced motion, freeze at a dignified greeting pose
         if (prefersReducedMotion) {
-          mixer.update(character === 'man' ? 0.6 : 2.6); // Hold peak greeting pose
+          mixer.update(character === 'man' ? 0.6 : 2.6);
           action.paused = true;
         }
+      } else {
+        console.warn(`[GLTF Animation Action] No animation clips found for ${character}`);
       }
 
-      setIsLoaded(true);
+      if (isMounted) {
+        setIsLoaded(true);
+        setHasError(false);
+      }
     };
 
-    // Load GLB file with procedural fallback
+    // --- LOAD GLB MODEL DIRECTLY (NO PROCEDURAL FALLBACK) ---
     const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
-    const glbPath = `${basePath}/models/${character === 'man' ? 'punjabi_man.glb' : 'punjabi_woman.glb'}`;
+    const glbUrl = `${basePath}/models/${character === 'man' ? 'punjabi_man.glb' : 'punjabi_woman.glb'}`;
     const loader = new GLTFLoader();
 
+    console.log(`[GLTFLoader] Requesting ${character} model from ${glbUrl}`);
+
     loader.load(
-      glbPath,
+      glbUrl,
       (gltf) => {
+        if (!isMounted) return;
+        console.log(`[GLTFLoader] Successfully loaded ${character} GLB model (${glbUrl})`);
         setupAnimations(gltf.scene, gltf.animations);
       },
       undefined,
       (error) => {
-        console.warn(`[3D Viewer] Notice: Falling back to procedural humanoid rig for ${character}:`, error);
-        const fallback = character === 'man' ? createPunjabiMan() : createPunjabiWoman();
-        setupAnimations(fallback.scene, fallback.animations);
+        if (!isMounted) return;
+        console.error(`[GLTFLoader Error] Failed to load ${character} model from ${glbUrl}:`, error);
+        // Do NOT display any procedural fallback geometry.
+        setIsLoaded(false);
+        setHasError(true);
       }
     );
 
     // --- RESIZE HANDLING ---
     const handleResize = () => {
-      if (!container) return;
+      if (!container || !renderer) return;
       const width = container.clientWidth;
       const height = container.clientHeight;
       if (width === 0 || height === 0) return;
@@ -184,10 +213,11 @@ export const PunjabiCharacterCanvas: React.FC<PunjabiCharacterCanvasProps> = ({
 
       if (isVisible) {
         if (mixer && !prefersReducedMotion) {
-          mixer.update(delta);
+          // Clamp delta to prevent erratic jumps on tab return
+          mixer.update(Math.min(delta, 0.1));
         }
 
-        // Subtle dynamic light shimmer
+        // Subtle warm light shimmer
         const time = clock.getElapsedTime();
         keyLight.intensity = 2.8 + 0.15 * Math.sin(time * 1.5);
 
@@ -199,6 +229,7 @@ export const PunjabiCharacterCanvas: React.FC<PunjabiCharacterCanvasProps> = ({
 
     // --- CLEANUP DISPOSAL ---
     return () => {
+      isMounted = false;
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
       observer.disconnect();
@@ -208,7 +239,7 @@ export const PunjabiCharacterCanvas: React.FC<PunjabiCharacterCanvasProps> = ({
       }
 
       scene.traverse((child) => {
-        if ((child as THREE.Mesh).isMesh || (child as THREE.SkinnedMesh).isSkinnedMesh) {
+        if ((child as THREE.Mesh).isMesh) {
           const mesh = child as THREE.Mesh;
           if (mesh.geometry) mesh.geometry.dispose();
           if (Array.isArray(mesh.material)) {
@@ -237,10 +268,10 @@ export const PunjabiCharacterCanvas: React.FC<PunjabiCharacterCanvasProps> = ({
         aria-hidden="true"
       />
 
-      {/* Graceful subtle shimmer while initializing */}
-      {!isLoaded && (
+      {/* Subtle spinner during initial load (clears as soon as GLB loads or errors) */}
+      {!isLoaded && !hasError && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-12 h-12 rounded-full border border-saffron-500/30 border-t-saffron-400 animate-spin opacity-40" />
+          <div className="w-10 h-10 rounded-full border border-saffron-500/30 border-t-saffron-400 animate-spin opacity-40" />
         </div>
       )}
     </div>
