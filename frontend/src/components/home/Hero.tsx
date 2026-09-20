@@ -1,39 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowDown, Sparkles } from 'lucide-react';
 import { siteConfig } from '../../config/site';
 import { Button } from '../common/Button';
 import { luxuryEase } from '../../animations/variants';
+import { PunjabiCharacterCanvas } from '../3d/PunjabiCharacterCanvas';
 
 export const Hero: React.FC = () => {
-  const shouldReduceMotion = useReducedMotion();
-
-  // Character 1: Gentle Bhangra bounce & sway
-  const bhangraMotion = shouldReduceMotion
-    ? {}
-    : {
-        y: [0, -6, 0, -3, 0],
-        rotate: [0, 1, 0, -1, 0],
-        transition: {
-          duration: 5.2,
-          repeat: Infinity,
-          ease: "easeInOut" as const,
-        },
-      };
-
-  // Character 2: Gentle hospitable greeting breathing motion
-  const welcomeMotion = shouldReduceMotion
-    ? {}
-    : {
-        y: [0, -5, 0],
-        scale: [1, 1.012, 1],
-        transition: {
-          duration: 5.8,
-          repeat: Infinity,
-          ease: "easeInOut" as const,
-        },
-      };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-16">
@@ -54,7 +28,7 @@ export const Hero: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_10%,rgba(10,10,9,0.65)_100%)]" />
       </motion.div>
 
-      {/* CHARACTER 1 — LEFT: Punjabi Man Host in subtle Bhangra pose */}
+      {/* CHARACTER 1 — LEFT: Punjabi Man Host in 3D Skeletal Bhangra */}
       <motion.aside
         aria-hidden="true"
         initial={{ opacity: 0, x: -35 }}
@@ -62,23 +36,20 @@ export const Hero: React.FC = () => {
         transition={{ duration: 1.1, delay: 0.6, ease: luxuryEase }}
         className="hidden md:block absolute bottom-6 lg:bottom-10 left-4 lg:left-8 xl:left-14 z-10 pointer-events-none w-36 md:w-44 lg:w-52 xl:w-60 max-w-[18vw] select-none"
       >
-        <motion.div
-          animate={bhangraMotion}
-          className="relative overflow-hidden rounded-t-[100px] rounded-b-xl border border-saffron-500/25 bg-gradient-to-t from-charcoal-950 via-charcoal-900/40 to-transparent p-1 shadow-[0_12px_40px_rgba(0,0,0,0.85),0_0_25px_rgba(230,126,34,0.12)] backdrop-blur-xs"
-        >
-          <img
-            src="/characters/punjabi_man_host.jpg"
-            alt=""
-            className="w-full h-auto object-cover rounded-t-[96px] brightness-95 contrast-105"
+        <div className="relative overflow-hidden rounded-t-[100px] rounded-b-xl border border-saffron-500/25 bg-gradient-to-t from-charcoal-950 via-charcoal-900/40 to-transparent p-1 shadow-[0_12px_40px_rgba(0,0,0,0.85),0_0_25px_rgba(230,126,34,0.12)] backdrop-blur-xs">
+          <PunjabiCharacterCanvas
+            character="man"
+            defaultClip="Bhangra"
+            className="w-full h-[320px] sm:h-[360px] md:h-[400px] lg:h-[450px]"
           />
           {/* Subtle bottom fade */}
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-charcoal-950 via-charcoal-950/80 to-transparent" />
-          <div className="absolute bottom-2 inset-x-0 text-center">
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-charcoal-950 via-charcoal-950/80 to-transparent pointer-events-none" />
+          <div className="absolute bottom-2 inset-x-0 text-center pointer-events-none">
             <span className="text-[9px] uppercase tracking-[0.25em] text-saffron-400 font-bold px-2 py-0.5 bg-charcoal-950/85 border border-saffron-500/30 rounded-xs shadow-sm">
               Rangla Punjab
             </span>
           </div>
-        </motion.div>
+        </div>
       </motion.aside>
 
       {/* Hero Central Content Stagger Sequence */}
@@ -140,7 +111,7 @@ export const Hero: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* CHARACTER 2 — RIGHT: Punjabi Woman Host in welcoming greeting pose */}
+      {/* CHARACTER 2 — RIGHT: Punjabi Woman Host in 3D Skeletal Namaste Greeting */}
       <motion.aside
         aria-hidden="true"
         initial={{ opacity: 0, x: 35 }}
@@ -148,23 +119,20 @@ export const Hero: React.FC = () => {
         transition={{ duration: 1.1, delay: 0.6, ease: luxuryEase }}
         className="hidden md:block absolute bottom-6 lg:bottom-10 right-4 lg:right-8 xl:right-14 z-10 pointer-events-none w-36 md:w-44 lg:w-52 xl:w-60 max-w-[18vw] select-none"
       >
-        <motion.div
-          animate={welcomeMotion}
-          className="relative overflow-hidden rounded-t-[100px] rounded-b-xl border border-terracotta-500/25 bg-gradient-to-t from-charcoal-950 via-charcoal-900/40 to-transparent p-1 shadow-[0_12px_40px_rgba(0,0,0,0.85),0_0_25px_rgba(209,73,42,0.12)] backdrop-blur-xs"
-        >
-          <img
-            src="/characters/punjabi_woman_host.jpg"
-            alt=""
-            className="w-full h-auto object-cover rounded-t-[96px] brightness-95 contrast-105"
+        <div className="relative overflow-hidden rounded-t-[100px] rounded-b-xl border border-terracotta-500/25 bg-gradient-to-t from-charcoal-950 via-charcoal-900/40 to-transparent p-1 shadow-[0_12px_40px_rgba(0,0,0,0.85),0_0_25px_rgba(209,73,42,0.12)] backdrop-blur-xs">
+          <PunjabiCharacterCanvas
+            character="woman"
+            defaultClip="Namaste"
+            className="w-full h-[320px] sm:h-[360px] md:h-[400px] lg:h-[450px]"
           />
           {/* Subtle bottom fade */}
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-charcoal-950 via-charcoal-950/80 to-transparent" />
-          <div className="absolute bottom-2 inset-x-0 text-center">
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-charcoal-950 via-charcoal-950/80 to-transparent pointer-events-none" />
+          <div className="absolute bottom-2 inset-x-0 text-center pointer-events-none">
             <span className="text-[9px] uppercase tracking-[0.25em] text-terracotta-400 font-bold px-2 py-0.5 bg-charcoal-950/85 border border-terracotta-500/30 rounded-xs shadow-sm">
               Ji Aayan Nu
             </span>
           </div>
-        </motion.div>
+        </div>
       </motion.aside>
 
       {/* 5. Bottom Scroll Indicator */}
