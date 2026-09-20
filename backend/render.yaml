@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: pind-da-dhaba-api
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: ADMIN_SECRET_KEY
+        sync: false
