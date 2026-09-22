@@ -5,9 +5,14 @@ import { ArrowDown, Sparkles } from 'lucide-react';
 import { siteConfig } from '../../config/site';
 import { Button } from '../common/Button';
 import { luxuryEase } from '../../animations/variants';
+import { useTheme } from '../../context/ThemeContext';
+import { HaveliParticles } from './HaveliParticles';
+import { InteractiveDiya } from './InteractiveDiya';
 
 export const Hero: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
+  const { theme, atmosphere } = useTheme();
+  const isDay = theme === 'day';
 
   // Subtle cursor parallax for high-end agency feel (max 6-8px, slow dampening)
   const mouseX = useMotionValue(0);
@@ -60,6 +65,14 @@ export const Hero: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/45 to-charcoal-950/80" />
         <div className="absolute inset-0 bg-gradient-to-r from-charcoal-950/85 via-transparent to-charcoal-950/85" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(10,10,9,0.85)_100%)]" />
+
+        {/* Soft Golden Daylight Sunbeam Overlay when Day Mode */}
+        {isDay && (
+          <div className="absolute inset-0 bg-gradient-to-tr from-amber-700/10 via-amber-300/15 to-transparent pointer-events-none transition-opacity duration-1000" />
+        )}
+
+        {/* Living Haveli Floating Embers & Dust Particles */}
+        <HaveliParticles count={isDay ? 14 : 26} />
 
         {/* Warm Amber Tandoor Key Light & Hearth Glow */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_78%,rgba(209,73,42,0.18)_0%,transparent_60%)]" />
@@ -121,12 +134,12 @@ export const Hero: React.FC = () => {
           x: shouldReduceMotion ? 0 : leftHostParallaxX,
           y: shouldReduceMotion ? 0 : leftHostParallaxY,
         }}
-        className="hidden md:block absolute bottom-3 lg:bottom-6 left-3 md:left-6 lg:left-8 xl:left-14 2xl:left-20 z-10 pointer-events-none w-44 md:w-52 lg:w-60 xl:w-72 max-w-[20vw] select-none"
+        className="hidden md:block absolute bottom-3 lg:bottom-6 left-3 md:left-6 lg:left-8 xl:left-14 2xl:left-20 z-10 pointer-events-auto group w-44 md:w-52 lg:w-60 xl:w-72 max-w-[20vw] select-none cursor-pointer interactive-element"
       >
         {/* Royal Haveli Arched Niche Frame */}
-        <div className="relative overflow-hidden rounded-t-[130px] lg:rounded-t-[150px] rounded-b-2xl border border-amber-500/25 bg-gradient-to-t from-charcoal-950 via-charcoal-900/70 to-charcoal-950/40 p-1.5 shadow-[0_24px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(229,169,60,0.12)] backdrop-blur-md">
+        <div className="relative overflow-hidden rounded-t-[130px] lg:rounded-t-[150px] rounded-b-2xl border border-amber-500/25 group-hover:border-amber-400/60 bg-gradient-to-t from-charcoal-950 via-charcoal-900/70 to-charcoal-950/40 p-1.5 shadow-[0_24px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(229,169,60,0.12)] group-hover:shadow-[0_28px_60px_rgba(0,0,0,0.95),0_0_45px_rgba(229,169,60,0.25)] backdrop-blur-md transition-all duration-500">
           {/* Subtle Ambient Rim Glow behind host */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(229,169,60,0.2)_0%,transparent_68%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(229,169,60,0.2)_0%,transparent_68%)] group-hover:opacity-100 opacity-70 transition-opacity duration-500 pointer-events-none" />
 
           {/* 2.5D Multi-Layer Motion Wrapper */}
           <motion.div
@@ -196,7 +209,7 @@ export const Hero: React.FC = () => {
       {/* 3. HERO CENTRAL EDITORIAL MASTHEAD CONTENT                                */}
       {/* ========================================================================= */}
       <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* 1. Eyebrow Tag: From the Heart of Punjab */}
+        {/* 1. Time-Aware Atmosphere Eyebrow Tag */}
         <motion.div
           initial={{ opacity: 0, y: -18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -206,7 +219,7 @@ export const Hero: React.FC = () => {
           <span className="w-1 h-1 rounded-full bg-amber-400" />
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           <span className="text-[10px] sm:text-xs font-semibold tracking-[0.32em] uppercase text-amber-300/90 font-sans">
-            {siteConfig.hero.eyebrow}
+            {atmosphere.greeting} • {atmosphere.timeSubtitle}
           </span>
           <span className="w-1 h-1 rounded-full bg-amber-400" />
         </motion.div>
@@ -261,6 +274,11 @@ export const Hero: React.FC = () => {
             </Button>
           </Link>
         </motion.div>
+
+        {/* 5. Living Haveli Interactive Welcome Diya */}
+        <div className="mt-8 flex justify-center">
+          <InteractiveDiya />
+        </div>
       </div>
 
       {/* ========================================================================= */}
@@ -275,12 +293,12 @@ export const Hero: React.FC = () => {
           x: shouldReduceMotion ? 0 : rightHostParallaxX,
           y: shouldReduceMotion ? 0 : rightHostParallaxY,
         }}
-        className="hidden md:block absolute bottom-3 lg:bottom-6 right-3 md:right-6 lg:right-8 xl:right-14 2xl:right-20 z-10 pointer-events-none w-44 md:w-52 lg:w-60 xl:w-72 max-w-[20vw] select-none"
+        className="hidden md:block absolute bottom-3 lg:bottom-6 right-3 md:right-6 lg:right-8 xl:right-14 2xl:right-20 z-10 pointer-events-auto group w-44 md:w-52 lg:w-60 xl:w-72 max-w-[20vw] select-none cursor-pointer interactive-element"
       >
         {/* Royal Haveli Arched Niche Frame */}
-        <div className="relative overflow-hidden rounded-t-[130px] lg:rounded-t-[150px] rounded-b-2xl border border-terracotta-500/25 bg-gradient-to-t from-charcoal-950 via-charcoal-900/70 to-charcoal-950/40 p-1.5 shadow-[0_24px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(209,73,42,0.12)] backdrop-blur-md">
+        <div className="relative overflow-hidden rounded-t-[130px] lg:rounded-t-[150px] rounded-b-2xl border border-terracotta-500/25 group-hover:border-terracotta-400/60 bg-gradient-to-t from-charcoal-950 via-charcoal-900/70 to-charcoal-950/40 p-1.5 shadow-[0_24px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(209,73,42,0.12)] group-hover:shadow-[0_28px_60px_rgba(0,0,0,0.95),0_0_45px_rgba(209,73,42,0.25)] backdrop-blur-md transition-all duration-500">
           {/* Subtle Ambient Rim Glow behind hostess */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(209,73,42,0.2)_0%,transparent_68%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(209,73,42,0.2)_0%,transparent_68%)] group-hover:opacity-100 opacity-70 transition-opacity duration-500 pointer-events-none" />
 
           {/* 2.5D Multi-Layer Motion Wrapper */}
           <motion.div

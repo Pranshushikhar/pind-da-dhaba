@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
-import { siteConfig } from '../../config/site';
+import { ArrowUpRight, BookOpen } from 'lucide-react';
+import { siteConfig, type MenuItemType } from '../../config/site';
 import { DietaryBadge, SpicyBadge } from '../common/Badge';
 import { formatPrice } from '../../lib/utils';
 import { fadeUp } from '../../animations/variants';
+import { DishOriginModal } from './DishOriginModal';
 
 export const SignatureDishes: React.FC = () => {
+  const [selectedDish, setSelectedDish] = useState<MenuItemType | null>(null);
   return (
     <section className="py-24 sm:py-32 bg-charcoal-950 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,7 +45,17 @@ export const SignatureDishes: React.FC = () => {
               custom={idx}
               whileHover={{ y: -8 }}
               transition={{ duration: 0.3 }}
-              className="group bg-charcoal-900 border border-charcoal-750 flex flex-col h-full overflow-hidden hover:border-terracotta-500/50 hover:shadow-2xl hover:shadow-terracotta-500/10 transition-colors"
+              onClick={() => setSelectedDish(dish)}
+              className="group bg-charcoal-900 border border-charcoal-750 flex flex-col h-full overflow-hidden hover:border-terracotta-500/50 hover:shadow-2xl hover:shadow-terracotta-500/10 transition-colors cursor-pointer interactive-element"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedDish(dish);
+                }
+              }}
+              aria-label={`View origin story and details for ${dish.name}`}
             >
               {/* Image Container with Zoom & Overlay */}
               <div className="relative aspect-[4/3] w-full overflow-hidden bg-charcoal-850">
@@ -84,10 +96,11 @@ export const SignatureDishes: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Bottom CTA Row */}
+                {/* Bottom CTA Row: Origin Story Trigger */}
                 <div className="pt-4 border-t border-charcoal-800 flex items-center justify-between">
-                  <span className="text-[11px] uppercase tracking-widest text-cream-400">
-                    Traditional Preparation
+                  <span className="text-[11px] uppercase tracking-widest text-amber-400 font-medium group-hover:text-amber-300 flex items-center gap-1.5 transition-colors">
+                    <BookOpen className="w-3 h-3 text-amber-400" />
+                    <span>View Origin Lore</span>
                   </span>
                   <div className="w-7 h-7 rounded-full bg-charcoal-800 flex items-center justify-center text-cream-300 group-hover:bg-terracotta-500 group-hover:text-white transition-colors">
                     <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -98,6 +111,13 @@ export const SignatureDishes: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Editorial Dish Origin Story Modal */}
+      <DishOriginModal
+        dish={selectedDish}
+        isOpen={!!selectedDish}
+        onClose={() => setSelectedDish(null)}
+      />
     </section>
   );
 };

@@ -5,6 +5,7 @@ import { Menu as MenuIcon, X, Phone } from 'lucide-react';
 import { siteConfig } from '../../config/site';
 import { Button } from './Button';
 import { cn } from '../../lib/utils';
+import { DayNightToggle } from './DayNightToggle';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -119,6 +120,8 @@ export const Navbar: React.FC = () => {
 
           {/* Right Header CTAs */}
           <div className="hidden md:flex items-center gap-4">
+            <DayNightToggle />
+
             <a
               href={`tel:${siteConfig.contact.phoneClean}`}
               className="text-xs text-cream-300 hover:text-saffron-400 flex items-center gap-1.5 font-medium transition-colors tracking-wider"
@@ -135,10 +138,12 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Mobile Hamburger Button */}
-          <div className="flex items-center gap-3 md:hidden">
+          {/* Mobile Hamburger Button & Day/Night Toggle */}
+          <div className="flex items-center gap-2 sm:gap-3 md:hidden">
+            <DayNightToggle />
+
             <Link to="/reserve">
-              <Button variant="primary" size="sm" className="px-3 py-1.5 text-[11px]">
+              <Button variant="primary" size="sm" className="px-2.5 sm:px-3 py-1.5 text-[10px] sm:text-[11px]">
                 Book
               </Button>
             </Link>

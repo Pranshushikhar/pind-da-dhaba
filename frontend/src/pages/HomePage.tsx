@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Hero } from '../components/home/Hero';
 import { BrandStatement } from '../components/home/BrandStatement';
 import { SignatureDishes } from '../components/home/SignatureDishes';
+import { TandoorHeatSection } from '../components/home/TandoorHeatSection';
 import { StorySection } from '../components/home/StorySection';
 import { ExperienceSection } from '../components/home/ExperienceSection';
 import { Marquee } from '../components/home/Marquee';
@@ -44,6 +45,9 @@ export const HomePage: React.FC<HomePageProps> = ({ scrollTo }) => {
 
       {/* 4. Signature dishes */}
       <SignatureDishes />
+
+      {/* 4b. Tandoor Heat Mode — From Fire, Flavour */}
+      <TandoorHeatSection />
 
       {/* 5. Experience Section */}
       <ExperienceSection />

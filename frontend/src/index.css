@@ -11,6 +11,11 @@
     background-color: #0A0A09;
     color: #FDFBF7;
     overflow-x: hidden;
+    transition: background-color 1.8s cubic-bezier(0.16, 1, 0.3, 1), color 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  html.theme-day body {
+    background-color: #141210;
   }
 
   /* Custom scrollbar for modern browsers */

@@ -429,5 +429,14 @@ export const siteConfig = {
       rating: 5,
       avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80"
     }
-  ] as TestimonialType[]
+  ] as TestimonialType[],
+
+  experience: {
+    dayNightEnabled: true,
+    timeAwareGreeting: true,
+    tandoorModeEnabled: true,
+    diyaEnabled: true,
+    cinematicIntroEnabled: true,
+    luxuryCursorEnabled: true,
+  }
 };
