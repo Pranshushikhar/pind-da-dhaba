@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useAudio } from '../../context/AudioContext';
 
 const INTRO_SESSION_KEY = 'pind-da-dhaba-intro-seen';
 
 export const CinematicIntro: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
+  const { play } = useAudio();
   const [isVisible, setIsVisible] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     const seen = sessionStorage.getItem(INTRO_SESSION_KEY);
@@ -13,18 +15,27 @@ export const CinematicIntro: React.FC = () => {
 
   const [step, setStep] = useState<'black' | 'flame' | 'light' | 'arches' | 'text'>('black');
 
+  const finishIntro = useCallback(() => {
+    sessionStorage.setItem(INTRO_SESSION_KEY, 'true');
+    setIsVisible(false);
+  }, []);
+
   useEffect(() => {
     if (!isVisible || shouldReduceMotion) return;
 
     // Sequence timing:
     // 0.0s - 0.4s: Deep Black
-    // 0.4s: Single Diya Flame ignites
+    // 0.4s: Single Diya Flame ignites + subtle ambient audio attempt
     // 1.0s: Warm light expands outward
     // 1.5s: Haveli arch silhouettes emerge
     // 2.0s: Text "JI AAYAN NU — Welcome to Pind Da Dhaba"
-    // 3.6s: Complete and transition into hero
+    // 3.8s: Complete and transition into hero
 
-    const t1 = setTimeout(() => setStep('flame'), 400);
+    const t1 = setTimeout(() => {
+      setStep('flame');
+      // Subtle ambient audio trigger if browser policy allows
+      play().catch(() => {});
+    }, 400);
     const t2 = setTimeout(() => setStep('light'), 1000);
     const t3 = setTimeout(() => setStep('arches'), 1500);
     const t4 = setTimeout(() => setStep('text'), 2000);
@@ -37,12 +48,7 @@ export const CinematicIntro: React.FC = () => {
       clearTimeout(t4);
       clearTimeout(t5);
     };
-  }, [isVisible, shouldReduceMotion]);
-
-  const finishIntro = () => {
-    sessionStorage.setItem(INTRO_SESSION_KEY, 'true');
-    setIsVisible(false);
-  };
+  }, [isVisible, shouldReduceMotion, finishIntro, play]);
 
   if (!isVisible || shouldReduceMotion) {
     return null;

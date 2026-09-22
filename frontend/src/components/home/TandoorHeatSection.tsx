@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useState, useRef } from 'react';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { Flame, Thermometer } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { fadeUp } from '../../animations/variants';
@@ -68,32 +68,46 @@ export const TandoorHeatSection: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
   const [activeStage, setActiveStage] = useState<number>(2); // Default to 900°F Clay Inferno
 
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Dynamic Scroll-Driven Atmosphere: Cooler dark haveli transitioning to warm orange/gold fire environment
+  const fireWarmth = useTransform(scrollYProgress, [0.05, 0.35, 0.7, 0.95], [0, 1, 1, 0.2]);
+  const glowScale = useTransform(scrollYProgress, [0.1, 0.5, 0.9], [0.85, 1.25, 0.95]);
+
   const current = HEAT_STAGES[activeStage];
 
   return (
-    <section className="relative py-28 sm:py-36 bg-charcoal-950 overflow-hidden border-t border-charcoal-800/80 select-none">
-      {/* Scroll Into The Fire: Dynamic Atmosphere Transformation */}
+    <section
+      ref={sectionRef}
+      className="relative py-28 sm:py-36 bg-charcoal-950 overflow-hidden border-t border-charcoal-800/80 select-none transition-colors duration-1000"
+    >
+      {/* Scroll Into The Fire: Dynamic Atmosphere Transformation based on Scroll Position */}
       <motion.div
-        animate={{
-          backgroundColor: current.glowColor,
-          opacity: [0.75, 0.95, 0.75],
+        style={{
+          opacity: shouldReduceMotion ? 0.75 : fireWarmth,
+          scale: shouldReduceMotion ? 1 : glowScale,
         }}
-        transition={{
-          duration: shouldReduceMotion ? 0 : 4,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-        className="absolute -top-32 left-1/2 -translate-x-1/2 w-[850px] h-[850px] rounded-full blur-[150px] pointer-events-none transition-colors duration-1000"
+        className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full blur-[160px] pointer-events-none bg-[radial-gradient(circle,rgba(224,114,76,0.38)_0%,rgba(229,169,60,0.22)_45%,transparent_75%)]"
         aria-hidden="true"
       />
 
-      {/* Tandoor Embers rising through the heat */}
+      {/* Dynamic Warm Orange/Gold Environment Backdrop Wash */}
+      <motion.div
+        style={{ opacity: shouldReduceMotion ? 0.6 : fireWarmth }}
+        className="absolute inset-0 bg-gradient-to-b from-transparent via-terracotta-900/10 to-charcoal-950 pointer-events-none"
+      />
+
+      {/* Restrained Tandoor Embers rising through the heat */}
       <div className="absolute inset-0 pointer-events-none">
-        <HaveliParticles count={22} />
+        <HaveliParticles count={26} />
       </div>
 
-      {/* Subtle Heat Haze & Deep Rim Shadows */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(10,10,9,0.85)_100%)] pointer-events-none" />
+      {/* Subtle Heat Haze & Deeper Shadows */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(10,10,9,0.92)_100%)] pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Editorial Chapter Badge & Section Headings */}

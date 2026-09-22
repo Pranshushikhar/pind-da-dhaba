@@ -1,26 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
 export const InteractiveDiya: React.FC<{ className?: string }> = ({ className = '' }) => {
   const shouldReduceMotion = useReducedMotion();
   const [isAwakened, setIsAwakened] = useState<boolean>(false);
+  const timeoutRef = useRef<number | null>(null);
 
   const triggerDiya = () => {
-    setIsAwakened((prev) => !prev);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setIsAwakened(true);
+    // Emotional microinteraction: ignites flame, expands warmth, shows "JI AAYAN NU", returns naturally
+    timeoutRef.current = window.setTimeout(() => {
+      setIsAwakened(false);
+    }, 3800);
   };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   return (
     <>
-      {/* Viewport-Wide Haveli Warmth Expansion when Diya is Awakened */}
+      {/* Viewport-Wide Haveli Warmth Expansion when Diya is Ignited */}
       <AnimatePresence>
         {isAwakened && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: 'easeOut' }}
-            className="fixed inset-0 z-20 pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(229,169,60,0.14)_0%,rgba(209,73,42,0.06)_50%,transparent_80%)]"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.02 }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-20 pointer-events-none bg-[radial-gradient(circle_at_50%_70%,rgba(229,169,60,0.22)_0%,rgba(209,73,42,0.10)_45%,transparent_80%)] backdrop-brightness-[1.04]"
             aria-hidden="true"
           />
         )}
