@@ -18,11 +18,11 @@ export const BrandStatement: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
-              className="inline-flex items-center gap-2"
+              className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-saffron-500/30 bg-charcoal-950/80 mb-2 shadow-sm"
             >
-              <span className="w-8 h-px bg-terracotta-500" />
-              <span className="text-xs uppercase tracking-[0.25em] text-saffron-400 font-bold">
-                {siteConfig.brandStatement.label}
+              <span className="w-1.5 h-1.5 rounded-full bg-saffron-400" />
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.32em] text-saffron-400 font-bold font-sans">
+                Chapter 01 — Punjab
               </span>
             </motion.div>
 

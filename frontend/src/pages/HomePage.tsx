@@ -43,11 +43,11 @@ export const HomePage: React.FC<HomePageProps> = ({ scrollTo }) => {
       {/* 3. Brand statement & Stats */}
       <BrandStatement />
 
-      {/* 4. Signature dishes */}
-      <SignatureDishes />
-
-      {/* 4b. Tandoor Heat Mode — From Fire, Flavour */}
+      {/* Chapter 02: The Fire */}
       <TandoorHeatSection />
+
+      {/* Chapter 03: The Table */}
+      <SignatureDishes />
 
       {/* 5. Experience Section */}
       <ExperienceSection />

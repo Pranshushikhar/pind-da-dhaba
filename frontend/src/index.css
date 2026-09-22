@@ -15,7 +15,15 @@
   }
 
   html.theme-day body {
-    background-color: #141210;
+    background-color: #161411;
+  }
+
+  html.theme-day .bg-charcoal-950 {
+    background-color: #141210 !important;
+  }
+
+  html.theme-day .bg-charcoal-900 {
+    background-color: #1E1B17 !important;
   }
 
   /* Custom scrollbar for modern browsers */

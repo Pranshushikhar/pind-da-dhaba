@@ -14,19 +14,26 @@ export const Hero: React.FC = () => {
   const { theme, atmosphere } = useTheme();
   const isDay = theme === 'day';
 
-  // Subtle cursor parallax for high-end agency feel (max 6-8px, slow dampening)
+  // Smooth, subtle 2.5D multi-plane depth physics
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const springConfig = { damping: 30, stiffness: 60 };
+  const springConfig = { damping: 36, stiffness: 50 };
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
 
-  const leftHostParallaxX = useTransform(smoothX, [-600, 600], [-8, 8]);
-  const leftHostParallaxY = useTransform(smoothY, [-400, 400], [-6, 6]);
-  const rightHostParallaxX = useTransform(smoothX, [-600, 600], [8, -8]);
-  const rightHostParallaxY = useTransform(smoothY, [-400, 400], [-6, 6]);
-  const bgParallaxX = useTransform(smoothX, [-600, 600], [6, -6]);
-  const bgParallaxY = useTransform(smoothY, [-400, 400], [4, -4]);
+  // Background deep layer (slow subtle shift)
+  const bgParallaxX = useTransform(smoothX, [-700, 700], [8, -8]);
+  const bgParallaxY = useTransform(smoothY, [-500, 500], [5, -5]);
+
+  // Midground haze & lights
+  const midParallaxX = useTransform(smoothX, [-700, 700], [4, -4]);
+  const midParallaxY = useTransform(smoothY, [-500, 500], [2, -2]);
+
+  // Foreground host characters (crisp 2.5D depth response)
+  const leftHostX = useTransform(smoothX, [-700, 700], [-10, 10]);
+  const leftHostY = useTransform(smoothY, [-500, 500], [-6, 6]);
+  const rightHostX = useTransform(smoothX, [-700, 700], [10, -10]);
+  const rightHostY = useTransform(smoothY, [-500, 500], [-6, 6]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -41,16 +48,16 @@ export const Hero: React.FC = () => {
   }, [mouseX, mouseY]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-20 select-none">
+    <section className="relative min-h-[96vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-20 select-none">
       {/* ========================================================================= */}
-      {/* 1. CINEMATIC BACKGROUND WITH HAVELI ARCHITECTURAL ATMOSPHERE              */}
+      {/* 1. BACKGROUND LAYER: DEEP ARCHITECTURAL HAVELI ENVIRONMENT                */}
       {/* ========================================================================= */}
       <motion.div
         style={{
           x: shouldReduceMotion ? 0 : bgParallaxX,
           y: shouldReduceMotion ? 0 : bgParallaxY,
         }}
-        initial={{ scale: 1.08, opacity: 0 }}
+        initial={{ scale: 1.06, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 1.8, ease: luxuryEase }}
         className="absolute inset-0 z-0 pointer-events-none"
@@ -58,32 +65,28 @@ export const Hero: React.FC = () => {
         <img
           src={siteConfig.hero.bgImage}
           alt="Royal Punjabi Tandoor Gastronomy"
-          className="w-full h-full object-cover object-center filter brightness-[0.42] contrast-110"
+          className="w-full h-full object-cover object-center filter brightness-[0.38] contrast-[1.12]"
         />
 
-        {/* Deep Haveli Stone Charcoal Vignette Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/45 to-charcoal-950/80" />
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal-950/85 via-transparent to-charcoal-950/85" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(10,10,9,0.85)_100%)]" />
+        {/* Deep Haveli Stone Charcoal Overlays & Vignette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/50 to-charcoal-950/85" />
+        <div className="absolute inset-0 bg-gradient-to-r from-charcoal-950/90 via-transparent to-charcoal-950/90" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(10,10,9,0.92)_100%)]" />
 
-        {/* Soft Golden Daylight Sunbeam Overlay when Day Mode */}
-        {isDay && (
-          <div className="absolute inset-0 bg-gradient-to-tr from-amber-700/10 via-amber-300/15 to-transparent pointer-events-none transition-opacity duration-1000" />
-        )}
+        {/* Dynamic Day/Night Atmospheric Hue */}
+        <div
+          className={`absolute inset-0 pointer-events-none transition-opacity duration-1500 ${
+            isDay
+              ? 'bg-gradient-to-tr from-amber-700/15 via-amber-200/12 to-transparent opacity-100'
+              : 'bg-[radial-gradient(ellipse_at_top,rgba(229,169,60,0.06)_0%,rgba(10,10,9,0.7)_100%)] opacity-90'
+          }`}
+        />
 
-        {/* Living Haveli Floating Embers & Dust Particles */}
-        <HaveliParticles count={isDay ? 14 : 26} />
-
-        {/* Warm Amber Tandoor Key Light & Hearth Glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_78%,rgba(209,73,42,0.18)_0%,transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,rgba(229,169,60,0.08)_0%,transparent_50%)]" />
-
-        {/* Subtle Traditional Haveli Arch & Jaali Geometric Silhouette (Low Opacity SVG) */}
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-screen overflow-hidden">
+        {/* Subtle Traditional Haveli Arch & Jaali Geometric Silhouette (Lattice Pattern) */}
+        <div className="absolute inset-0 opacity-[0.045] pointer-events-none mix-blend-screen overflow-hidden">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="jaali-lattice" width="60" height="60" patternUnits="userSpaceOnUse">
-                {/* Refined 8-pointed star jaali lattice pattern */}
                 <path
                   d="M30 0 L36 18 L54 18 L39 29 L45 47 L30 36 L15 47 L21 29 L6 18 L24 18 Z"
                   fill="none"
@@ -101,29 +104,47 @@ export const Hero: React.FC = () => {
           </svg>
         </div>
 
-        {/* Soft Haveli Arch Frame Contour Overlay */}
-        <div className="absolute inset-x-0 top-0 h-48 pointer-events-none opacity-20">
+        {/* Majestic Grand Haveli Arch Framing Header */}
+        <div className="absolute inset-x-0 top-0 h-48 pointer-events-none opacity-25">
           <svg
             viewBox="0 0 1440 180"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-full preserve-3d"
+            className="w-full h-full"
           >
             <path
               d="M0 0 H1440 V40 C1200 40 1000 140 720 140 C440 140 240 40 0 40 V0 Z"
-              fill="rgba(10,10,9,0.9)"
+              fill="rgba(10,10,9,0.92)"
             />
             <path
               d="M0 42 C240 42 440 142 720 142 C1000 142 1200 42 1440 42"
-              stroke="rgba(229,169,60,0.25)"
-              strokeWidth="1"
+              stroke="rgba(229,169,60,0.3)"
+              strokeWidth="1.2"
             />
           </svg>
         </div>
       </motion.div>
 
       {/* ========================================================================= */}
-      {/* 2. CHARACTER 1 — LEFT: PUNJABI MAN HOST (2.5D CINEMATIC HAVELI NICHE)     */}
+      {/* 2. MIDGROUND LAYER: ATMOSPHERIC HAZE, WARM HEARTH GLOW, PARTICLES        */}
+      {/* ========================================================================= */}
+      <motion.div
+        style={{
+          x: shouldReduceMotion ? 0 : midParallaxX,
+          y: shouldReduceMotion ? 0 : midParallaxY,
+        }}
+        className="absolute inset-0 z-5 pointer-events-none"
+      >
+        {/* Living Haveli Floating Embers & Dust Particles */}
+        <HaveliParticles count={isDay ? 16 : 28} />
+
+        {/* Warm Amber Tandoor Key Light & Hearth Radiance */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(209,73,42,0.22)_0%,transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,rgba(229,169,60,0.09)_0%,transparent_50%)]" />
+      </motion.div>
+
+      {/* ========================================================================= */}
+      {/* 3. FOREGROUND CHARACTER 1 — LEFT: PUNJABI MAN HOST (2.5D HAVELI NICHE)    */}
       {/* ========================================================================= */}
       <motion.aside
         aria-label="Punjabi Man Host - Rangla Punjab"
@@ -131,44 +152,44 @@ export const Hero: React.FC = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1.2, delay: 0.4, ease: luxuryEase }}
         style={{
-          x: shouldReduceMotion ? 0 : leftHostParallaxX,
-          y: shouldReduceMotion ? 0 : leftHostParallaxY,
+          x: shouldReduceMotion ? 0 : leftHostX,
+          y: shouldReduceMotion ? 0 : leftHostY,
         }}
         className="hidden md:block absolute bottom-3 lg:bottom-6 left-3 md:left-6 lg:left-8 xl:left-14 2xl:left-20 z-10 pointer-events-auto group w-44 md:w-52 lg:w-60 xl:w-72 max-w-[20vw] select-none cursor-pointer interactive-element"
       >
         {/* Royal Haveli Arched Niche Frame */}
-        <div className="relative overflow-hidden rounded-t-[130px] lg:rounded-t-[150px] rounded-b-2xl border border-amber-500/25 group-hover:border-amber-400/60 bg-gradient-to-t from-charcoal-950 via-charcoal-900/70 to-charcoal-950/40 p-1.5 shadow-[0_24px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(229,169,60,0.12)] group-hover:shadow-[0_28px_60px_rgba(0,0,0,0.95),0_0_45px_rgba(229,169,60,0.25)] backdrop-blur-md transition-all duration-500">
-          {/* Subtle Ambient Rim Glow behind host */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(229,169,60,0.2)_0%,transparent_68%)] group-hover:opacity-100 opacity-70 transition-opacity duration-500 pointer-events-none" />
+        <div className="relative overflow-hidden rounded-t-[130px] lg:rounded-t-[150px] rounded-b-2xl border border-amber-500/25 group-hover:border-amber-400/60 bg-gradient-to-t from-charcoal-950 via-charcoal-900/75 to-charcoal-950/45 p-1.5 shadow-[0_24px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(229,169,60,0.14)] group-hover:shadow-[0_28px_60px_rgba(0,0,0,0.95),0_0_45px_rgba(229,169,60,0.28)] backdrop-blur-md transition-all duration-500">
+          {/* Subtle Ambient Rim Glow behind host responding to cursor hover */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(229,169,60,0.22)_0%,transparent_68%)] group-hover:opacity-100 opacity-70 transition-opacity duration-500 pointer-events-none" />
 
-          {/* 2.5D Multi-Layer Motion Wrapper */}
+          {/* 2.5D Multi-Layer Motion Wrapper: Bhangra Rhythm & Proud Host Posture */}
           <motion.div
             animate={
               shouldReduceMotion
                 ? undefined
                 : {
-                    y: [0, -6, -2, -7, 0],
+                    y: [0, -5, -1, -6, 0],
                   }
             }
             transition={{
-              duration: 6.8,
+              duration: 6.4,
               repeat: Infinity,
               ease: 'easeInOut',
             }}
             className="relative w-full h-[360px] md:h-[420px] lg:h-[480px] xl:h-[530px] flex items-end justify-center overflow-hidden"
           >
-            {/* Inner Organic Rhythm Layer: Bhangra-inspired subtle shoulder sway & proud host breathing */}
+            {/* Inner Organic Rhythm: Subtle shoulder sway and steady breath cycle */}
             <motion.div
               animate={
                 shouldReduceMotion
                   ? undefined
                   : {
-                      rotate: [0, 0.75, -0.45, 0.65, -0.3, 0],
-                      scale: [1, 1.014, 1.005, 1.018, 1],
+                      rotate: [0, 0.65, -0.4, 0.55, -0.25, 0],
+                      scale: [1, 1.014, 1.006, 1.016, 1],
                     }
               }
               transition={{
-                duration: 6.8,
+                duration: 6.4,
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
@@ -206,7 +227,7 @@ export const Hero: React.FC = () => {
       </motion.aside>
 
       {/* ========================================================================= */}
-      {/* 3. HERO CENTRAL EDITORIAL MASTHEAD CONTENT                                */}
+      {/* 4. CENTRAL EDITORIAL MASTHEAD & INTERACTIVE WELCOME DIYA                  */}
       {/* ========================================================================= */}
       <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* 1. Time-Aware Atmosphere Eyebrow Tag */}
@@ -247,7 +268,7 @@ export const Hero: React.FC = () => {
           {siteConfig.hero.description}
         </motion.p>
 
-        {/* 4. Action Buttons: Refined Luxury Micro-Interactions */}
+        {/* 4. Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -282,7 +303,7 @@ export const Hero: React.FC = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. CHARACTER 2 — RIGHT: PUNJABI WOMAN HOST (2.5D CINEMATIC NAMASTE NICHE) */}
+      {/* 5. FOREGROUND CHARACTER 2 — RIGHT: PUNJABI WOMAN HOST (2.5D HAVELI NICHE) */}
       {/* ========================================================================= */}
       <motion.aside
         aria-label="Punjabi Woman Host - Ji Aayan Nu"
@@ -290,45 +311,45 @@ export const Hero: React.FC = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1.2, delay: 0.4, ease: luxuryEase }}
         style={{
-          x: shouldReduceMotion ? 0 : rightHostParallaxX,
-          y: shouldReduceMotion ? 0 : rightHostParallaxY,
+          x: shouldReduceMotion ? 0 : rightHostX,
+          y: shouldReduceMotion ? 0 : rightHostY,
         }}
         className="hidden md:block absolute bottom-3 lg:bottom-6 right-3 md:right-6 lg:right-8 xl:right-14 2xl:right-20 z-10 pointer-events-auto group w-44 md:w-52 lg:w-60 xl:w-72 max-w-[20vw] select-none cursor-pointer interactive-element"
       >
         {/* Royal Haveli Arched Niche Frame */}
-        <div className="relative overflow-hidden rounded-t-[130px] lg:rounded-t-[150px] rounded-b-2xl border border-terracotta-500/25 group-hover:border-terracotta-400/60 bg-gradient-to-t from-charcoal-950 via-charcoal-900/70 to-charcoal-950/40 p-1.5 shadow-[0_24px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(209,73,42,0.12)] group-hover:shadow-[0_28px_60px_rgba(0,0,0,0.95),0_0_45px_rgba(209,73,42,0.25)] backdrop-blur-md transition-all duration-500">
+        <div className="relative overflow-hidden rounded-t-[130px] lg:rounded-t-[150px] rounded-b-2xl border border-terracotta-500/25 group-hover:border-terracotta-400/60 bg-gradient-to-t from-charcoal-950 via-charcoal-900/75 to-charcoal-950/45 p-1.5 shadow-[0_24px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(209,73,42,0.14)] group-hover:shadow-[0_28px_60px_rgba(0,0,0,0.95),0_0_45px_rgba(209,73,42,0.28)] backdrop-blur-md transition-all duration-500">
           {/* Subtle Ambient Rim Glow behind hostess */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(209,73,42,0.2)_0%,transparent_68%)] group-hover:opacity-100 opacity-70 transition-opacity duration-500 pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(209,73,42,0.22)_0%,transparent_68%)] group-hover:opacity-100 opacity-70 transition-opacity duration-500 pointer-events-none" />
 
-          {/* 2.5D Multi-Layer Motion Wrapper */}
+          {/* 2.5D Multi-Layer Motion Wrapper: Namaste Rhythm & Warm Hospitality */}
           <motion.div
             animate={
               shouldReduceMotion
                 ? undefined
                 : {
-                    y: [0, -5, -1, -6, 0],
+                    y: [0, -4, -1, -5, 0],
                   }
             }
             transition={{
-              duration: 7.4,
+              duration: 7.2,
               repeat: Infinity,
               ease: 'easeInOut',
             }}
             className="relative w-full h-[360px] md:h-[420px] lg:h-[480px] xl:h-[530px] flex items-end justify-center overflow-hidden"
           >
-            {/* Inner Namaste / Welcome Rhythm: graceful forward tilt, respectful hold, smooth return */}
+            {/* Inner Namaste Greeting: Graceful forward tilt, respectful pause, smooth release */}
             <motion.div
               animate={
                 shouldReduceMotion
                   ? undefined
                   : {
-                      rotate: [0, -0.3, -0.65, -0.65, 0],
-                      scale: [1, 1.01, 1.015, 1.015, 1],
+                      rotate: [0, -0.3, -0.6, -0.6, 0],
+                      scale: [1, 1.012, 1.016, 1.016, 1],
                       y: [0, 1.5, 2.5, 2.5, 0],
                     }
               }
               transition={{
-                duration: 7.4,
+                duration: 7.2,
                 repeat: Infinity,
                 times: [0, 0.25, 0.45, 0.7, 1],
                 ease: 'easeInOut',
@@ -367,7 +388,7 @@ export const Hero: React.FC = () => {
       </motion.aside>
 
       {/* ========================================================================= */}
-      {/* 5. BOTTOM SCROLL INDICATOR                                                */}
+      {/* 6. BOTTOM SCROLL INDICATOR                                                */}
       {/* ========================================================================= */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -394,5 +415,3 @@ export const Hero: React.FC = () => {
     </section>
   );
 };
-
-

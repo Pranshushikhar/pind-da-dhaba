@@ -1,133 +1,156 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
 export const InteractiveDiya: React.FC<{ className?: string }> = ({ className = '' }) => {
-  const [isLit, setIsLit] = useState<boolean>(false);
+  const shouldReduceMotion = useReducedMotion();
+  const [isAwakened, setIsAwakened] = useState<boolean>(false);
 
-  const toggleDiya = () => {
-    setIsLit((prev) => !prev);
+  const triggerDiya = () => {
+    setIsAwakened((prev) => !prev);
   };
 
   return (
-    <div className={cn("relative inline-flex flex-col items-center select-none", className)}>
-      {/* Background Radiance Glow when lit */}
+    <>
+      {/* Viewport-Wide Haveli Warmth Expansion when Diya is Awakened */}
       <AnimatePresence>
-        {isLit && (
+        {isAwakened && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1.25 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 1.2, ease: 'easeOut' }}
-            className="absolute -top-12 w-36 h-36 rounded-full bg-gradient-to-t from-amber-500/35 via-saffron-500/20 to-transparent blur-2xl pointer-events-none"
+            className="fixed inset-0 z-20 pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(229,169,60,0.14)_0%,rgba(209,73,42,0.06)_50%,transparent_80%)]"
             aria-hidden="true"
           />
         )}
       </AnimatePresence>
 
-      {/* Hospitality Message: "JI AAYAN NU" */}
-      <AnimatePresence>
-        {isLit && (
-          <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.95 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="mb-2 text-center pointer-events-none"
-          >
-            <span className="font-serif text-xs md:text-sm uppercase tracking-[0.3em] font-semibold text-amber-300 drop-shadow-[0_2px_8px_rgba(229,169,60,0.6)]">
-              Ji Aayan Nu
-            </span>
-            <span className="block text-[8px] uppercase tracking-[0.2em] text-cream-300/80 font-sans">
-              Welcome With Soul
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className={cn("relative inline-flex flex-col items-center select-none", className)}>
+        {/* Local Radiance Halo */}
+        <motion.div
+          animate={{
+            scale: isAwakened ? 1.6 : 1,
+            opacity: isAwakened ? 0.9 : 0.45,
+          }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="absolute -top-10 w-32 h-32 rounded-full bg-[radial-gradient(circle,rgba(229,169,60,0.35)_0%,rgba(209,73,42,0.15)_40%,transparent_70%)] blur-2xl pointer-events-none"
+          aria-hidden="true"
+        />
 
-      {/* The Diya Button */}
-      <button
-        type="button"
-        onClick={toggleDiya}
-        aria-label={isLit ? "Extinguish the welcome diya" : "Light the welcome diya"}
-        aria-pressed={isLit}
-        title={isLit ? "Diya is lit — Ji Aayan Nu. Click to extinguish." : "Click to light the traditional welcome diya."}
-        className={cn(
-          "group relative flex flex-col items-center justify-end p-2 rounded-full cursor-pointer transition-transform duration-300",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-charcoal-950",
-          "hover:scale-105 active:scale-95"
-        )}
-      >
-        {/* Animated Flame */}
-        <div className="relative h-6 w-4 flex items-end justify-center mb-0.5">
-          <AnimatePresence>
-            {isLit ? (
-              <motion.div
-                key="flame"
-                initial={{ scaleY: 0, opacity: 0 }}
-                animate={{
-                  scaleY: [0.85, 1.15, 0.95, 1.1, 0.85],
-                  scaleX: [0.9, 1.08, 0.95, 1.05, 0.9],
-                  opacity: [0.85, 1, 0.9, 1, 0.85],
-                }}
-                exit={{ scaleY: 0, opacity: 0 }}
-                transition={{
-                  duration: 1.8,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-                className="origin-bottom relative flex flex-col items-center"
-              >
-                {/* Outer Flame Glow */}
-                <div className="w-3.5 h-6 rounded-t-full rounded-b-[40%] bg-gradient-to-t from-terracotta-500 via-amber-400 to-amber-200 shadow-[0_0_12px_rgba(229,169,60,0.9)]" />
-                {/* Inner Core Flame */}
-                <div className="absolute bottom-0 w-1.5 h-3 rounded-t-full bg-gradient-to-t from-cream-100 to-amber-100 opacity-95" />
-              </motion.div>
-            ) : (
-              /* Unlit Wick */
-              <div className="w-[1.5px] h-2.5 bg-charcoal-600 rounded-t-xs" />
-            )}
-          </AnimatePresence>
-        </div>
+        {/* Hospitality Message: "JI AAYAN NU" */}
+        <AnimatePresence>
+          {isAwakened && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 6, scale: 0.96 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="mb-3 text-center pointer-events-none z-10"
+            >
+              <span className="font-serif text-sm sm:text-base uppercase tracking-[0.35em] font-semibold text-amber-300 drop-shadow-[0_2px_12px_rgba(229,169,60,0.8)]">
+                Ji Aayan Nu
+              </span>
+              <span className="block text-[9px] uppercase tracking-[0.25em] text-cream-300/90 font-sans mt-0.5">
+                May light grace your visit
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Brass Diya Vessel (Earthen Clay / Antique Brass Silhouette) */}
-        <svg
-          width="36"
-          height="16"
-          viewBox="0 0 36 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="transition-all duration-300 drop-shadow-md"
+        {/* The Diya Vessel & Flame Button */}
+        <button
+          type="button"
+          onClick={triggerDiya}
+          aria-label="Light the diya"
+          aria-pressed={isAwakened}
+          title="Click to ignite the traditional hospitality flame"
+          className={cn(
+            "group relative flex flex-col items-center justify-end p-2.5 rounded-full cursor-pointer transition-transform duration-300",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-charcoal-950",
+            "hover:scale-105 active:scale-95 interactive-element"
+          )}
         >
-          {/* Diya Bowl */}
-          <path
-            d="M3 4 C7 14, 29 14, 33 4 C35 2, 31 1, 26 2 C18 3, 10 3, 2 2 C1 1, 1 3, 3 4 Z"
-            fill={isLit ? "url(#diya-brass-lit)" : "url(#diya-brass-dim)"}
-            stroke={isLit ? "#E5A93C" : "#785838"}
-            strokeWidth="0.8"
-          />
-          {/* Base Stand */}
-          <ellipse cx="18" cy="14" rx="7" ry="1.5" fill="#291C17" stroke={isLit ? "#B04722" : "#46413D"} strokeWidth="0.5" />
+          {/* Flame */}
+          <div className="relative h-7 w-5 flex items-end justify-center mb-0.5">
+            <motion.div
+              animate={
+                shouldReduceMotion
+                  ? undefined
+                  : {
+                      scaleY: isAwakened ? [1.1, 1.35, 1.15, 1.3, 1.1] : [0.85, 1.05, 0.9, 1.0, 0.85],
+                      scaleX: isAwakened ? [1, 1.12, 0.96, 1.08, 1] : [0.92, 1.04, 0.94, 1.02, 0.92],
+                      opacity: isAwakened ? [0.95, 1, 0.92, 1, 0.95] : [0.75, 0.9, 0.8, 0.9, 0.75],
+                    }
+              }
+              transition={{
+                duration: 1.6,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+              className="origin-bottom relative flex flex-col items-center"
+            >
+              {/* Outer Golden Flame */}
+              <div
+                className={cn(
+                  "rounded-t-full rounded-b-[40%] bg-gradient-to-t from-terracotta-500 via-amber-400 to-amber-200 transition-all duration-500",
+                  isAwakened
+                    ? "w-4 h-7 shadow-[0_0_20px_rgba(229,169,60,0.95)]"
+                    : "w-3 h-5 shadow-[0_0_10px_rgba(229,169,60,0.6)]"
+                )}
+              />
+              {/* Inner White-Cream Core */}
+              <div
+                className={cn(
+                  "absolute bottom-0.5 rounded-t-full bg-cream-50 transition-all duration-500",
+                  isAwakened ? "w-1.5 h-3.5 opacity-95" : "w-1 h-2 opacity-80"
+                )}
+              />
+            </motion.div>
+          </div>
 
-          <defs>
-            <linearGradient id="diya-brass-lit" x1="0" y1="0" x2="36" y2="16" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#8F3516" />
-              <stop offset="50%" stopColor="#E5A93C" />
-              <stop offset="100%" stopColor="#B04722" />
-            </linearGradient>
-            <linearGradient id="diya-brass-dim" x1="0" y1="0" x2="36" y2="16" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#322E2B" />
-              <stop offset="50%" stopColor="#523B32" />
-              <stop offset="100%" stopColor="#22201E" />
-            </linearGradient>
-          </defs>
-        </svg>
+          {/* Traditional Terracotta Vessel (SVG) */}
+          <svg
+            width="38"
+            height="18"
+            viewBox="0 0 38 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="transition-transform duration-300 drop-shadow-md group-hover:drop-shadow-[0_0_8px_rgba(229,169,60,0.5)]"
+          >
+            {/* Clay Bowl Base */}
+            <path
+              d="M3 6 C6 14, 32 14, 35 6 C35 6, 32 4, 19 4 C6 4, 3 6, 3 6 Z"
+              fill={isAwakened ? "#B34728" : "#8A361F"}
+              stroke="#E5A93C"
+              strokeWidth="1"
+            />
+            {/* Spout Lip */}
+            <ellipse
+              cx="19"
+              cy="5.5"
+              rx="15"
+              ry="2.5"
+              fill={isAwakened ? "#D1492A" : "#6E2B18"}
+              stroke="#F3C068"
+              strokeWidth="0.75"
+            />
+            {/* Oil Center */}
+            <ellipse
+              cx="19"
+              cy="5.5"
+              rx="10"
+              ry="1.5"
+              fill={isAwakened ? "#E5A93C" : "#A67224"}
+            />
+          </svg>
 
-        {/* Subtle Hint Label */}
-        <span className="text-[8px] uppercase tracking-[0.22em] text-cream-400/60 mt-1 font-sans transition-colors group-hover:text-amber-300">
-          {isLit ? 'Tap to rest' : 'Light Diya'}
-        </span>
-      </button>
-    </div>
+          {/* Under-diya subtle hint text */}
+          <span className="text-[8px] uppercase tracking-[0.25em] text-cream-400/70 font-sans mt-1 group-hover:text-amber-300 transition-colors">
+            {isAwakened ? "Flame Awakened" : "Touch to Welcome"}
+          </span>
+        </button>
+      </div>
+    </>
   );
 };
