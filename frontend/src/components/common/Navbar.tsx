@@ -64,10 +64,10 @@ export const Navbar: React.FC = () => {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-40 transition-all duration-300",
+          "fixed top-0 left-0 right-0 z-40 transition-all duration-500",
           isScrolled
-            ? "glass-header border-b border-charcoal-700/80 shadow-2xl py-3 sm:py-3.5"
-            : "bg-gradient-to-b from-charcoal-950/90 via-charcoal-950/40 to-transparent py-4 sm:py-5"
+            ? "bg-charcoal-950/85 backdrop-blur-md border-b border-amber-500/20 shadow-xl py-3 sm:py-3.5"
+            : "bg-gradient-to-b from-charcoal-950/70 via-charcoal-950/20 to-transparent border-b border-amber-500/10 py-3.5 sm:py-4"
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 flex items-center justify-between">
